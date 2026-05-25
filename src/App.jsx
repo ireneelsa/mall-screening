@@ -1,97 +1,170 @@
-import { lazy, Suspense, useEffect, useState } from 'react';
-import Lenis from '@studio-freight/lenis';
-import { AnimatePresence } from 'framer-motion';
-import Nav from './components/Nav';
-import Hero from './components/Hero';
-import WhyThisProperty from './sections/WhyThisProperty';
-import Retail from './sections/Retail';
-import Dining from './sections/Dining';
-import Attractions from './sections/Attractions';
-import Events from './sections/Events';
+import { useEffect, useMemo, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import CustomCursor from './components/CustomCursor';
-import PageLoader from './components/PageLoader';
+import EnterScreen from './components/EnterScreen';
+import IntroGate from './components/IntroGate';
+import Sidebar from './components/Sidebar';
+import SlideControls from './components/SlideControls';
+import Slide01Overview from './slides/Slide01Overview';
+import Slide02Stats from './slides/Slide02Stats';
+import Slide03Location from './slides/Slide03Location';
+import Slide04RetailOverview from './slides/Slide04RetailOverview';
+import Slide05RetailCategories from './slides/Slide05RetailCategories';
+import Slide06Luxury from './slides/Slide06Luxury';
+import Slide07Dining from './slides/Slide07Dining';
+import Slide08Attractions from './slides/Slide08Attractions';
+import Slide09Nickelodeon from './slides/Slide09Nickelodeon';
+import Slide10SnowWater from './slides/Slide10SnowWater';
+import Slide11Events from './slides/Slide11Events';
+import Slide12Venues from './slides/Slide12Venues';
+import Slide13Sponsorship from './slides/Slide13Sponsorship';
+import Slide14Audience from './slides/Slide14Audience';
+import Slide15Leasing from './slides/Slide15Leasing';
+import Slide16Contact from './slides/Slide16Contact';
 
-const EventsModule = lazy(() => import('./modules/EventsModule'));
-const SponsorshipModule = lazy(() => import('./modules/SponsorshipModule'));
-const LeasingModule = lazy(() => import('./modules/LeasingModule'));
+const slides = [
+  { section: 'Overview', component: Slide01Overview },
+  { section: 'Overview', component: Slide02Stats },
+  { section: 'Why This Property', component: Slide03Location },
+  { section: 'Retail', component: Slide04RetailOverview },
+  { section: 'Retail', component: Slide05RetailCategories },
+  { section: 'Luxury', component: Slide06Luxury },
+  { section: 'Dining', component: Slide07Dining },
+  { section: 'Attractions', component: Slide08Attractions },
+  { section: 'Attractions', component: Slide09Nickelodeon },
+  { section: 'Attractions', component: Slide10SnowWater },
+  { section: 'Events', component: Slide11Events },
+  { section: 'Events', component: Slide12Venues },
+  { section: 'Sponsorship', component: Slide13Sponsorship },
+  { section: 'Sponsorship', component: Slide14Audience },
+  { section: 'Leasing', component: Slide15Leasing },
+  { section: 'Contact', component: Slide16Contact },
+];
+
+const sections = [
+  'Overview',
+  'Why This Property',
+  'Retail',
+  'Luxury',
+  'Dining',
+  'Attractions',
+  'Events',
+  'Sponsorship',
+  'Leasing',
+  'Contact',
+];
+
+const slideVariants = {
+  enter: (direction) => ({
+    x: direction > 0 ? '100%' : '-100%',
+    opacity: 0,
+  }),
+  center: {
+    x: 0,
+    opacity: 1,
+  },
+  exit: (direction) => ({
+    x: direction > 0 ? '-100%' : '100%',
+    opacity: 0,
+  }),
+};
 
 function App() {
-  const [openModule, setOpenModule] = useState(null);
-  const [loading, setLoading] = useState(() => !sessionStorage.getItem('american-dream-loaded'));
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [soundOn, setSoundOn] = useState(false);
+  const [introComplete, setIntroComplete] = useState(false);
+  const [entered, setEntered] = useState(false);
+  const [direction, setDirection] = useState(1);
+
+  const activeSection = slides[currentSlide].section;
+
+  const sectionStarts = useMemo(
+    () => sections.map((section) => slides.findIndex((slide) => slide.section === section)),
+    [],
+  );
+
+  const goToSlide = (index) => {
+    const next = Math.min(Math.max(index, 0), slides.length - 1);
+    setDirection(next >= currentSlide ? 1 : -1);
+    setCurrentSlide(next);
+  };
+
+  const goToSection = (section) => {
+    const index = slides.findIndex((slide) => slide.section === section);
+    if (index >= 0) goToSlide(index);
+  };
+
+  const nextSlide = () => goToSlide(currentSlide + 1);
+  const prevSlide = () => goToSlide(currentSlide - 1);
 
   useEffect(() => {
-    const lenis = new Lenis({
-      lerp: 0.08,
-      duration: 1.4,
-      smoothWheel: true,
-    });
-
-    let frameId;
-    const raf = (time) => {
-      lenis.raf(time);
-      frameId = requestAnimationFrame(raf);
+    const handleKeyDown = (event) => {
+      if (!entered) return;
+      if (event.key === 'ArrowRight') nextSlide();
+      if (event.key === 'ArrowLeft') prevSlide();
     };
-    frameId = requestAnimationFrame(raf);
 
-    if (openModule) {
-      lenis.stop();
-    } else {
-      lenis.start();
-    }
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  });
 
-    window.lenis = lenis;
+  const ActiveSlide = slides[currentSlide].component;
 
-    return () => {
-      cancelAnimationFrame(frameId);
-      lenis.destroy();
-      delete window.lenis;
-    };
-  }, [openModule]);
+  if (!introComplete) {
+    return (
+      <IntroGate
+        soundOn={soundOn}
+        onToggleSound={() => setSoundOn((value) => !value)}
+        onComplete={() => setIntroComplete(true)}
+      />
+    );
+  }
 
-  useEffect(() => {
-    if (!loading) return undefined;
-
-    const timer = setTimeout(() => {
-      sessionStorage.setItem('american-dream-loaded', 'true');
-      setLoading(false);
-    }, 1800);
-
-    return () => clearTimeout(timer);
-  }, [loading]);
-
-  useEffect(() => {
-    document.body.style.overflow = openModule ? 'hidden' : '';
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [openModule]);
+  if (!entered) {
+    return (
+      <>
+        <CustomCursor />
+        <EnterScreen onEnter={() => setEntered(true)} />
+      </>
+    );
+  }
 
   return (
-    <div className="bg-background min-h-screen font-sans text-text antialiased selection:bg-accent/30 selection:text-white">
-      <AnimatePresence>{loading && <PageLoader />}</AnimatePresence>
+    <div className="deck-root bg-background font-sans text-text selection:bg-accent/30 selection:text-white">
       <CustomCursor />
-      <Nav />
-      <main>
-        <Hero />
-        <WhyThisProperty />
-        <Retail onOpenLeasing={() => setOpenModule('leasing')} />
-        <Dining />
-        <Attractions />
-        <Events
-          onOpenEvents={() => setOpenModule('events')}
-          onOpenSponsorship={() => setOpenModule('sponsorship')}
+      <Sidebar
+        open={sidebarOpen}
+        sections={sections}
+        sectionStarts={sectionStarts}
+        activeSection={activeSection}
+        onToggle={() => setSidebarOpen((value) => !value)}
+        onNavigate={goToSection}
+      />
+
+      <main className={`deck-main ${sidebarOpen ? 'deck-main-with-sidebar' : 'deck-main-focus'}`}>
+        <AnimatePresence initial={false} custom={direction} mode="wait">
+          <motion.div
+            key={currentSlide}
+            custom={direction}
+            variants={slideVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={{ duration: 0.5, ease: 'easeInOut' }}
+            className="absolute inset-0"
+          >
+            <ActiveSlide />
+          </motion.div>
+        </AnimatePresence>
+
+        <SlideControls
+          currentSlide={currentSlide}
+          totalSlides={slides.length}
+          onPrev={prevSlide}
+          onNext={nextSlide}
         />
       </main>
-
-      <AnimatePresence>
-        {openModule && (
-          <Suspense fallback={null}>
-            {openModule === 'events' && <EventsModule onClose={() => setOpenModule(null)} />}
-            {openModule === 'sponsorship' && <SponsorshipModule onClose={() => setOpenModule(null)} />}
-            {openModule === 'leasing' && <LeasingModule onClose={() => setOpenModule(null)} />}
-          </Suspense>
-        )}
-      </AnimatePresence>
     </div>
   );
 }
