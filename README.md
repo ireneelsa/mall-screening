@@ -1,45 +1,68 @@
 # American Dream Mall - Interactive Sales Deck
 
-A single-page, cinematic interactive sales deck web app for American Dream Mall (East Rutherford, NJ) targeting prospective retail tenants, sponsors, and event partners. 
+A cinematic, browser-based interactive sales tool for American Dream Mall.
+Built for prospective retail tenants, sponsors, and event partners.
 
-Built with a dark luxury aesthetic to feel confident, premium, and dynamic.
+## Live Demo
+[Pending Vercel deployment URL]
 
 ## Tech Stack
+- React 18 + Vite
+- Tailwind CSS
+- Framer Motion (animations)
+- Lenis (smooth scroll)
+- React.lazy + Suspense (code splitting)
 
-- **React + Vite** for fast development and optimized production builds.
-- **Tailwind CSS** for utility-first, highly customizable styling.
-- **Framer Motion** for smooth, cinematic animations.
-- **Lucide React** (Optional) for crisp scalable icons.
+## AI Tools Used
+- DALL-E / Midjourney: AI-generated hero and section imagery
+- Claude (Anthropic): architecture planning, prompt engineering, content copy generation
+- ChatGPT: supplementary copy and stat research
 
-## Getting Started
+## Project Structure
+```text
+src/
+  components/     # Nav, Hero, SectionWrapper, CustomCursor, AnimatedLine
+  sections/       # WhyThisProperty, Retail, Dining, Attractions, Events
+  modules/        # EventsModule, SponsorshipModule, LeasingModule
+  App.jsx         # Root, scroll tracking, module state, Lenis init
+  index.css       # Design tokens, global styles
+```
 
-### Prerequisites
+## Setup & Run Locally
+```bash
+git clone [your-repo-url]
+cd american-dream-sales-deck
+npm install
+npm run dev
+```
 
-- Node.js (v18+ recommended)
-- npm or yarn
+Open http://localhost:5173
 
-### Installation
+## Deploy to Vercel
+```bash
+npm i -g vercel
+vercel
+```
 
-1. Clone the repository or navigate to the project directory.
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-3. Start the development server:
-   ```bash
-   npm run dev
-   ```
+Follow prompts:
+- Framework: Vite
+- Build command: npm run build
+- Output directory: dist
 
-## Deployment
+Or push to GitHub and import at https://vercel.com/new.
 
-The project is optimized for deployment on Vercel.
+## Design Decisions
+- Dark luxury aesthetic (#0a0a0a) inspired by Apple, Hermes, Tesla
+- Cormorant Garamond for headlines, creating an editorial high-fashion feel
+- Non-linear navigation so the viewer controls their own journey
+- Video-first hero with particle fallback
+- Sub-modules as full-screen overlays to maintain immersion
+- Lenis smooth scroll + Framer Motion for a cinematic feel
+- React.lazy ensures fast initial load despite rich content
 
-1. Connect your GitHub repository to Vercel.
-2. The default build settings for Vite will be automatically detected:
-   - Build Command: `npm run build`
-   - Output Directory: `dist`
-3. Click "Deploy".
-
-## Visual Assets Note
-
-Visual assets (such as images, background textures, or placeholder graphics) have been generated or curated using AI tools (e.g., Midjourney, DALL-E) to establish the premium cinematic aesthetic of the application.
+## What I Would Improve With More Time
+- Real video assets from American Dream's official media library
+- Live backend for inquiry form submissions (Resend / Supabase)
+- More granular analytics per section (Plausible or Posthog)
+- 3D elements using Three.js for attractions section
+- CMS integration so sales team can update stats/content without code
