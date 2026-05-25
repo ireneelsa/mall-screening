@@ -22,8 +22,113 @@
     font-family: 'Inter', sans-serif;
     overflow-x: hidden;
   }
+
+  * {
+    box-sizing: border-box;
+  }
   
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Cormorant Garamond', serif;
+  }
+
+  button, a {
+    cursor: pointer;
+  }
+}
+
+@layer components {
+  .luxury-button-primary {
+    border-radius: 2px;
+    background: var(--accent);
+    color: var(--bg);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  }
+
+  .luxury-button-primary:hover {
+    background: #dec066;
+    box-shadow: 0 0 20px rgba(201, 168, 76, 0.4);
+  }
+
+  .luxury-button-secondary {
+    border-radius: 2px;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  }
+
+  .luxury-button-secondary:hover {
+    background: var(--accent);
+    color: var(--bg);
+    box-shadow: 0 0 20px rgba(201, 168, 76, 0.28);
+  }
+
+  .section-headline {
+    font-size: clamp(2.5rem, 5vw, 5rem);
+    letter-spacing: 0;
+  }
+
+  .section-eyebrow {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.3em;
+    color: var(--accent);
+    text-transform: uppercase;
+  }
+
+  .image-frame {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    background: #111;
+  }
+
+  .image-treatment {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease, filter 0.6s ease, opacity 0.6s ease;
+  }
+
+  .image-frame:hover .image-treatment {
+    transform: scale(1.03);
+  }
+
+  .image-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    pointer-events: none;
+    transition: background-color 0.6s ease;
+  }
+
+  .image-frame:hover .image-overlay {
+    background: rgba(0, 0, 0, 0.24);
+  }
+}
+
+@layer utilities {
+  .will-change-transform {
+    will-change: transform;
+  }
+}
+
+@keyframes cinematicHue {
+  0%, 100% {
+    filter: hue-rotate(0deg);
+    opacity: 0.24;
+  }
+  50% {
+    filter: hue-rotate(22deg);
+    opacity: 0.36;
+  }
+}
+
+.hero-gradient-shift {
+  animation: cinematicHue 12s ease-in-out infinite;
+}
+
+@media (pointer: coarse) {
+  body {
+    cursor: auto;
   }
 }
